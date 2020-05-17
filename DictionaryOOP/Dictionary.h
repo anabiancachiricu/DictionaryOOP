@@ -30,8 +30,8 @@ public:
 	void insertNode(K k, V v);
 	int getNoElements();
 
-	Node<K, V> minValueNode(Node<K, V>* n);
-	Node<K, V> deleteNode(Node<K, V> *root, K k);
+	Node<K, V>* minValueNode(Node<K, V>* n);
+	Node<K, V>* deleteNode(Node<K, V> *root, K k);
 	void deleteNodeFromKey(K k);
 
 	V find(K k, Node<K, V> *n);
@@ -49,7 +49,7 @@ inline int max(int a, int b) { if (a > b) return a; return b; }
 template <class K, class V, class Keycomp>
 Dictionary<K, V, Keycomp>::Dictionary()		//constructor fara parametrii
 {
-	root = new Node<K, V>;
+	root = NULL;
 	noElements = 0;
 }
 
@@ -171,7 +171,7 @@ Node<K, V>* Dictionary<K, V, Keycomp>::addNode(K& key, V& value, Node<K, V>* &n)
 			Node <K, V>* nou = addNode(key, value, n->left);
 			n->left = nou;
 			nou->parent = n;
-			this->noElements++;
+			//this->noElements++;
 		}
 		else
 		{
@@ -180,7 +180,7 @@ Node<K, V>* Dictionary<K, V, Keycomp>::addNode(K& key, V& value, Node<K, V>* &n)
 				Node <K, V>* nou = addNode(key, value, n->right);
 				n->right = nou;
 				nou->parent = n;
-				this->noElements++;
+				//this->noElements++;
 			}
 			else
 			{
@@ -219,9 +219,8 @@ Node<K, V>* Dictionary<K, V, Keycomp>::addNode(K& key, V& value, Node<K, V>* &n)
 template <class K, class V, class Keycomp>
 void Dictionary<K, V, Keycomp>::insertNode(K key, V value)
 {
-		//root = newNode(key, value);
 		root = addNode(key, value, root);
-		noElements++;
+		this->noElements++;
 }
 
 template <class K, class V, class Keycomp>
@@ -231,7 +230,7 @@ int Dictionary<K, V, Keycomp>::getNoElements()
 }
 
 template <class K, class V, class Keycomp>
-Node<K, V> Dictionary<K, V, Keycomp>::minValueNode(Node<K, V>* n)
+Node<K, V>* Dictionary<K, V, Keycomp>::minValueNode(Node<K, V>* n)
 {
 	Node<K, V>* current = n;
 	while (current->left != NULL)
@@ -242,7 +241,7 @@ Node<K, V> Dictionary<K, V, Keycomp>::minValueNode(Node<K, V>* n)
 }
 
 template <class K, class V, class Keycomp>
-Node<K, V> Dictionary<K, V, Keycomp>::deleteNode(Node<K, V> *root, K key)
+Node<K, V>* Dictionary<K, V, Keycomp>::deleteNode(Node<K, V> *root, K key)
 {
 	if (root == NULL) return root;
 	if (key < root->key)
