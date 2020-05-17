@@ -64,6 +64,6 @@ public:
 			return 0;
 		return this->height;
 	}
-	friend class Dictionary<K, V, KeyComp>;
+	friend class Dictionary<K, V, KeyComp<K>>;
 };
 

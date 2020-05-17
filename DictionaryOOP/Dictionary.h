@@ -1,6 +1,6 @@
 #pragma once
 #include "Node.h"
-#include "KeyComp.h"
+#include "Keycomp.h"
 #include<iostream>
 //#include<climits>
 using namespace std;
@@ -9,11 +9,14 @@ template <class K, class V, class KeyComp> class Dictionary
 {
 	Node<K, V>* root;
 	int noElements;
-
+	KeyComp Keycomp;
 public:
+
 	Dictionary();
 	Dictionary(const Dictionary& d);
 	Dictionary& operator=(const Dictionary& d);
+
+	Node <K, V>* newNode(K key, V value);
 
 	Node<K, V>* copyNode(Node<K, V>* n) const;
 	void clearNode(Node<K, V>*& n);
@@ -23,15 +26,15 @@ public:
 	Node<K, V>* RotateLeft(Node<K, V>* x);
 	Node<K, V>* RotateRight(Node<K, V>* y);
 
-	Node<K, V>* addNode(K& key, V& value, Node<K, V>*& n);
+	Node<K, V>* addNode(K& key, V& value, Node<K, V>* &n);
 	void insertNode(K k, V v);
 	int getNoElements();
 
 	Node<K, V> minValueNode(Node<K, V>* n);
-	Node<K, V> deleteNode(Node<K, V>root, K k);
+	Node<K, V> deleteNode(Node<K, V> *root, K k);
 	void deleteNodeFromKey(K k);
 
-	V find(K k, Node<K, V> n);
+	V find(K k, Node<K, V> *n);
 	V findKeyValue(K k);
 	V operator[](const K k);
 
@@ -43,15 +46,27 @@ public:
 
 inline int max(int a, int b) { if (a > b) return a; return b; }
 
-template <class K, class V, class KeyComp>
-Dictionary<K, V, KeyComp>::Dictionary()		//constructor fara parametrii
+template <class K, class V, class Keycomp>
+Dictionary<K, V, Keycomp>::Dictionary()		//constructor fara parametrii
 {
-	root = NULL;
+	root = new Node<K, V>;
 	noElements = 0;
 }
 
-template <class K, class V, class KeyComp>
-Node<K, V>* Dictionary<K, V, KeyComp>::copyNode(Node<K, V>* n) const		//functie care copiaza un nod
+template <class K, class V, class Keycomp>
+Node<K, V>* Dictionary<K, V, Keycomp>::newNode(K key, V value)
+{
+	Node<K, V>* node = new Node<K, V>();
+	node->key = key;
+	node->value = value;
+	node->left = NULL;
+	node->right = NULL;
+	node->height = 1;
+	return node;
+}
+
+template <class K, class V, class Keycomp>
+Node<K, V>* Dictionary<K, V, Keycomp>::copyNode(Node<K, V>* n) const		//functie care copiaza un nod
 {
 	if (n != NULL)
 	{
@@ -61,23 +76,23 @@ Node<K, V>* Dictionary<K, V, KeyComp>::copyNode(Node<K, V>* n) const		//functie 
 		root->parent = n->getParent();
 		root->key = n->getKey();
 		root->value = n->getValue();
-		//root->height = n->getHeight();
+		root->height = n->getHeight();
 		return root;
 	}
 	else
 		return NULL;
 }
 
-template <class K, class V, class KeyComp>			
-Dictionary<K, V, KeyComp>::Dictionary(const Dictionary& d)		//constructor de copiere
+template <class K, class V, class Keycomp>			
+Dictionary<K, V, Keycomp>::Dictionary(const Dictionary& d)		//constructor de copiere
 {
 	root = NULL;
 	this->root = copyNode(d.root);
 	this->noElements = d.noElements;
 }
 
-template <class K, class V, class KeyComp>
-Dictionary <K, V, KeyComp>& Dictionary<K, V, KeyComp>:: operator=(const Dictionary& d)		//supraincarcarea operatorului egal pentru dictionare
+template <class K, class V, class Keycomp>
+Dictionary <K, V, Keycomp>& Dictionary<K, V, Keycomp>:: operator=(const Dictionary& d)		//supraincarcarea operatorului egal pentru dictionare
 {
 	clearDictionary();
 	root = copyNode(d.root);
@@ -85,8 +100,8 @@ Dictionary <K, V, KeyComp>& Dictionary<K, V, KeyComp>:: operator=(const Dictiona
 	return *this;
 }
 
-template <class K, class V, class KeyComp>
-void Dictionary<K, V, KeyComp>::clearNode(Node <K, V>*& n)		//functie care sterge tot de la un anumit nod in jos, inclusiv nodul
+template <class K, class V, class Keycomp>
+void Dictionary<K, V, Keycomp>::clearNode(Node <K, V>*& n)		//functie care sterge tot de la un anumit nod in jos, inclusiv nodul
 {
 	if (n != NULL)
 	{
@@ -97,14 +112,14 @@ void Dictionary<K, V, KeyComp>::clearNode(Node <K, V>*& n)		//functie care sterg
 	n = NULL;
 }
 
-template <class K, class V, class KeyComp>
-void Dictionary<K, V, KeyComp>::clearDictionary()		//functie care sterge tot dictionarul, stergand fiecare nod pe rand
+template <class K, class V, class Keycomp>
+void Dictionary<K, V, Keycomp>::clearDictionary()		//functie care sterge tot dictionarul, stergand fiecare nod pe rand
 {
 	clearNode(root);
 }
 
-template <class K, class V, class KeyComp>
-Node<K, V>* Dictionary<K, V, KeyComp>::RotateLeft(Node<K, V>* x)
+template <class K, class V, class Keycomp>
+Node<K, V>* Dictionary<K, V, Keycomp>::RotateLeft(Node<K, V>* x)
 {
 	Node<K, V>* y = x->right;
 	Node<K, V>* z = y->left;
@@ -119,8 +134,8 @@ Node<K, V>* Dictionary<K, V, KeyComp>::RotateLeft(Node<K, V>* x)
 }
 
 
-template <class K, class V, class KeyComp>
-Node <K, V>* Dictionary<K, V, KeyComp>::RotateRight(Node<K, V>* y)
+template <class K, class V, class Keycomp>
+Node <K, V>* Dictionary<K, V, Keycomp>::RotateRight(Node<K, V>* y)
 {
 	Node<K, V>* x = y->left;
 	Node<K, V>* z = x->right;
@@ -135,47 +150,46 @@ Node <K, V>* Dictionary<K, V, KeyComp>::RotateRight(Node<K, V>* y)
 
 }
 
-template <class K, class V, class KeyComp>
-int Dictionary<K, V, KeyComp>::getBalance(Node<K, V>* n)
+template <class K, class V, class Keycomp>
+int Dictionary<K, V, Keycomp>::getBalance(Node<K, V>* n)
 {
 	if (n == NULL)
 		return 0;
 	return n->left->getHeight() - n->right->getHeight();
 }
-template <class K, class V, class KeyComp>
-Node<K, V>* Dictionary<K, V, KeyComp>::addNode(K& key, V& value, Node<K, V>*& n)
+template <class K, class V, class Keycomp>
+Node<K, V>* Dictionary<K, V, Keycomp>::addNode(K& key, V& value, Node<K, V>* &n)
 {
 	if (n == NULL)
 	{
-		n = new Node<K, V>;
-		n->left = NULL;
-		n->right = NULL;
-		n->key = key;
-		n->value = value;
-		n->height = 1;
-		return n;
-	}
-
-	if (key < n->getKey())
-	{
-		Node <K, V>* nou = addNode(key, value, n->left);
-		n->left = nou;
-		nou->parent = n;
+		return newNode(key, value);
 	}
 	else
 	{
-		if (key > n->getKey())
+		if (Keycomp(key , n->getKey())==1)
 		{
-			Node <K, V>* nou = addNode(key, value, n->right);
-			n->right = nou;
+			Node <K, V>* nou = addNode(key, value, n->left);
+			n->left = nou;
 			nou->parent = n;
+			this->noElements++;
 		}
 		else
 		{
-			n->value = value;
-			return n;
+			if (Keycomp(key, n->getKey()) == -1)
+			{
+				Node <K, V>* nou = addNode(key, value, n->right);
+				n->right = nou;
+				nou->parent = n;
+				this->noElements++;
+			}
+			else
+			{
+				n->value = value;
+				return n;
+			}
 		}
 	}
+	
 
 	n->height = 1 + max(n->left->getHeight(), n->right->getHeight());
 	
@@ -202,21 +216,22 @@ Node<K, V>* Dictionary<K, V, KeyComp>::addNode(K& key, V& value, Node<K, V>*& n)
 	return n;
 }
 
-template <class K, class V, class KeyComp>
-void Dictionary<K, V, KeyComp>::insertNode(K key, V value)
+template <class K, class V, class Keycomp>
+void Dictionary<K, V, Keycomp>::insertNode(K key, V value)
 {
-	root = addNode(key, value, root);
-	noElements++;
+		//root = newNode(key, value);
+		root = addNode(key, value, root);
+		noElements++;
 }
 
-template <class K, class V, class KeyComp>
-int Dictionary<K, V, KeyComp>::getNoElements()
+template <class K, class V, class Keycomp>
+int Dictionary<K, V, Keycomp>::getNoElements()
 {
 	return this->noElements;
 }
 
-template <class K, class V, class KeyComp>
-Node<K, V> Dictionary<K, V, KeyComp>::minValueNode(Node<K, V>* n)
+template <class K, class V, class Keycomp>
+Node<K, V> Dictionary<K, V, Keycomp>::minValueNode(Node<K, V>* n)
 {
 	Node<K, V>* current = n;
 	while (current->left != NULL)
@@ -226,8 +241,8 @@ Node<K, V> Dictionary<K, V, KeyComp>::minValueNode(Node<K, V>* n)
 	return current;
 }
 
-template <class K, class V, class KeyComp>
-Node<K, V> Dictionary<K, V, KeyComp>::deleteNode(Node<K, V> root, K key)
+template <class K, class V, class Keycomp>
+Node<K, V> Dictionary<K, V, Keycomp>::deleteNode(Node<K, V> *root, K key)
 {
 	if (root == NULL) return root;
 	if (key < root->key)
@@ -290,14 +305,14 @@ Node<K, V> Dictionary<K, V, KeyComp>::deleteNode(Node<K, V> root, K key)
 	return root;
 }
 
-template <class K, class V, class KeyComp>
-void Dictionary<K, V, KeyComp>::deleteNodeFromKey(K k)
+template <class K, class V, class Keycomp>
+void Dictionary<K, V, Keycomp>::deleteNodeFromKey(K k)
 {
 	root = deleteNode(root, k);
 	noElements--;
 }
-template <class K, class V, class KeyComp>
-V Dictionary<K, V, KeyComp>:: find(K k, Node<K, V> n)
+template <class K, class V, class Keycomp>
+V Dictionary<K, V, Keycomp>:: find(K k, Node<K, V> *n)
 {
 	if (root->key == k)
 		return root->getValue();
@@ -313,20 +328,20 @@ V Dictionary<K, V, KeyComp>:: find(K k, Node<K, V> n)
 		}
 	}
 }
-template <class K, class V, class KeyComp>
-V Dictionary<K, V, KeyComp>::findKeyValue(K k)
+template <class K, class V, class Keycomp>
+V Dictionary<K, V, Keycomp>::findKeyValue(K k)
 {
 	return find(k, root);
 }
-template <class K, class V, class KeyComp>
-V Dictionary<K, V, KeyComp>:: operator[](const K k)
+template <class K, class V, class Keycomp>
+V Dictionary<K, V, Keycomp>:: operator[](const K k)
 {
 	K key = k;
 	return this->findKeyValue(key);
 }
 
-template <class K, class V, class KeyComp>
-void Dictionary<K, V, KeyComp>::inOrder(Node<K, V>* n, ostream &out)
+template <class K, class V, class Keycomp>
+void Dictionary<K, V, Keycomp>::inOrder(Node<K, V>* n, ostream &out)
 {
 	if (n != NULL)
 	{
@@ -336,8 +351,8 @@ void Dictionary<K, V, KeyComp>::inOrder(Node<K, V>* n, ostream &out)
 	}
 }
 
-template <class K, class V, class KeyComp>
-ostream& operator<<(ostream& out, const Dictionary<K, V, KeyComp>& d)
+template <class K, class V, class Keycomp>
+ostream& operator<<(ostream& out, const Dictionary<K, V, Keycomp>& d)
 {
 	out << "Chei" << " " << "Valori:";
 	Node<K, V> * nou = d.root;
